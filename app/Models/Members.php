@@ -4,8 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Visit extends Model
+class Members extends Model
 {
-    protected $table = 'visits';
     //
 }

@@ -13,20 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('items', function (Blueprint $table) {
+        Schema::create('members', function (Blueprint $table) {
             $table->id();
 
             $table->string('name')->nullable(false);
 
-            $table->integer('qty')->nullable();
+            $table->string('phone')->nullable(false);
 
-            $table->string('description')->nullable();
+            $table->string('address')->nullable(false);
 
-            $table->string('colour')->nullable();
+            $table->string('uuid')->nullable(false)->unique();
 
-            $table->string('serial')->nullable();
-
-            $table->integer('visit')->nullable();
+            //$table->string('phone')->nullable(false)->unique();
 
             $table->rememberToken();
             $table->timestamps();
@@ -40,6 +38,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('items');
+        Schema::dropIfExists('members');
     }
 };

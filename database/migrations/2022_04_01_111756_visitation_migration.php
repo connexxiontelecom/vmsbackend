@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('visitations', function (Blueprint $table) {
             $table->id();
+            $table->integer('visit')->nullable(false);
             $table->integer('member')->nullable(false);
             $table->integer('membertype')->nullable(false);
             $table->rememberToken();

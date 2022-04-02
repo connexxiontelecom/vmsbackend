@@ -24,6 +24,8 @@ $router->group(['middleware' => ['jwt.auth'], 'prefix'=>'api/auth' ], function (
     $router->get('visitors', 'VisitorsController@getVisitors');
     $router->get('morevisitors', 'VisitorsController@getMoreVisitors');
     $router->get('allvisitors', 'VisitorsController@getAllVisitors');
+    $router->post('newvisit', 'VisitorsController@createVisit');
+    $router->get('visitorhistory', 'VisitorsController@getVisits');
 });
 
 $router->group(['prefix'=>'api'], function () use ($router) {
