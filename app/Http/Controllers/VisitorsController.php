@@ -5,12 +5,21 @@ use App\Models\Visit;
 use App\Models\Visitation;
 use App\Models\Visitor;
 use App\Models\Item;
+use App\Models\Visitorslog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Eloquent;
 class VisitorsController                                                                                                        extends Controller
 {
 
+
+    public function __construct()
+    {
+        $this->visitation =  new Visitation();
+        $this->visitor = new Visitor();
+    }
 
     public function register(Request $request)
     {
@@ -25,7 +34,7 @@ class VisitorsController                                                        
         $exists = Visitor::where("phone", $request->input('phone'))->first();
 
         if ($exists != null) {
-            return response()->json(['message' => 'Phone number is taken already', "code"=>200, "data"=>[]], 200);
+            return response()->json(['message' => 'Phone number is taken already', "code"=>406], 200);
         } else {
             $visitor = new Visitor();
             $visitor->name = $request->input('name');
@@ -33,11 +42,17 @@ class VisitorsController                                                        
             $visitor->address = $request->input('address');
             $visitor->uuid = substr(sha1(time()), 20, 40);
             $visitor->save();
-
-            return response()->json(['message' => 'Visitor Registered Successfully', "code"=>201, "data"=>$visitor], 201);
+            $totalVisit = $this->getTotalVisit($visitor->id);
+            $visitor->totalvisits = $totalVisit;
+            return response()->json(['message' => 'Visitor Registered Successfully', "code"=>200, "data"=>["visitors"=>$visitor]], 201);
 
         }
 
+    }
+
+    public function getTotalVisit($id){
+        $totalVisit = Visitation::where('member', $id)->where('membertype', 4)->count();
+        return $totalVisit;
     }
 
     public function getVisitors(){
@@ -45,7 +60,7 @@ class VisitorsController                                                        
         $count = Visitor::count();
         foreach($visitors as $visitor)
         {
-            $totalVisit = Visitation::where('member', $visitor->id)->where('membertype', 4)->count();
+            $totalVisit = $this->getTotalVisit($visitor->id); //Visitation::where('member', $visitor->id)->where('membertype', 4)->count();
             $visitor->totalvisits = $totalVisit;
         }
         return response()->json(['message' => 'success','code'=>'200', 'data'=>['visitors'=>$visitors, 'count'=>$count], 'code'=>200 ], 200);
@@ -60,7 +75,7 @@ class VisitorsController                                                        
         $visitors = Visitor::where('id', '<', $lastId)->orderBy('id','DESC')->take(10)->get();
         foreach($visitors as $visitor)
         {
-            $totalVisit = Visitation::where('member', $visitor->id)->where('membertype', 4)->count();
+            $totalVisit = $this->getTotalVisit($visitor->id);//Visitation::where('member', $visitor->id)->where('membertype', 4)->count();
             $visitor->totalvisits = $totalVisit;
         }
         $count = Visitor::count();
@@ -73,7 +88,7 @@ class VisitorsController                                                        
         $count = Visitor::count();
         foreach($visitors as $visitor)
         {
-            $totalVisit = Visitation::where('member', $visitor->id)->where('membertype', 4)->count();
+            $totalVisit = $this->getTotalVisit($visitor->id); //Visitation::where('member', $visitor->id)->where('membertype', 4)->count();
             $visitor->totalvisits = $totalVisit;
         }
         return response()->json(['message' => 'success','code'=>'200', 'data'=>['visitors'=>$visitors, 'count'=>$count], 'code'=>200 ], 200);
@@ -148,7 +163,7 @@ class VisitorsController                                                        
             $item->visit = $visit_id;
             $item->save();
         }
-        return response()->json(['message' => 'success','code'=>'200', 'data'=>[], 'code'=>201 ], 201);
+        return response()->json(['message' => 'success',  'code'=>200 ], 200);
     }
 
     public function getVisits(Request $request)
@@ -195,6 +210,28 @@ class VisitorsController                                                        
 
     }
 
+    //visitors who haven't signed out
+    public function currentVisitors(){
+        $visitors = $this->visitor->currentVisitors();
+        $count = Visitor::count();//total number of visitors
+        return response()->json(['message' => 'success', 'data'=>['current_visitors'=>$visitors,'total_visitors'=>$count], 'code'=>200 ], 200);
+    }
 
+    public function signOut(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+        $id  =  $request->input('id');
+
+        $visitation = $this->visitation->findVisitionById($id);
+        $visitation->signed_out = 1;
+        $visitation->sign_out_time = Carbon::now();
+        $visitation->save();
+        $current_visitors = $this->visitor->currentVisitors();
+        $count = Visitor::count();
+        return response()->json(['message' => 'success', 'data'=>['current_visitors'=>$current_visitors, 'total_visitors'=>$count], 'code'=>200 ], 200);
+
+    }
 
 }

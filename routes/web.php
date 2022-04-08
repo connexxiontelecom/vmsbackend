@@ -26,8 +26,27 @@ $router->group(['middleware' => ['jwt.auth'], 'prefix'=>'api/auth' ], function (
     $router->get('allvisitors', 'VisitorsController@getAllVisitors');
     $router->post('newvisit', 'VisitorsController@createVisit');
     $router->get('visitorhistory', 'VisitorsController@getVisits');
+    $router->get('currentvisitors', 'VisitorsController@currentVisitors');
+    $router->post('currentvisitors', 'VisitorsController@currentVisitors');
+    $router->post('visitorsignout', 'VisitorsController@signOut');
+    /* Members */
+    $router->post('newmember', 'MembersController@register');
+    $router->post('membervisits', 'MembersController@getVisits');
+    $router->get('members', 'MembersController@getMembers');
+
+    /*Appointments*/
+    $router->post('newappointment', 'AppointmentController@createAppointment');
+    $router->get('getappointments', 'AppointmentController@getAppointments');
+    $router->get('getmoreappointments', 'AppointmentController@getMoreAppointments');
+    $router->get('getappointmentssummary', 'AppointmentController@getAppointmentsSummary');
+    $router->get('pendingappointments', 'AppointmentController@pendingAppointments');
+
+
+
 });
 
+
+/* Unauthenticated Routes */
 $router->group(['prefix'=>'api'], function () use ($router) {
     $router->post('register', 'AuthController@register');
     $router->post('login', 'AuthController@login');

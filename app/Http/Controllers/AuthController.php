@@ -48,17 +48,17 @@ class AuthController extends Controller
         $response = $this->attemptLogin($credentials["username"], $credentials["password"]);
         if ($response!=false)
         {
-            return response()->json(['message' => 'Login Successfull', "data"=>$response], 200);
+            return response()->json(['message' => 'Login Successfull', 'code'=>200, "data"=>$response], 200);
         }
         else{
-            return response()->json(['message' => 'Login Failed', 'code'=>200], 200);
+            return response()->json(['message' => 'Login Failed!, Username or Password incorrect', 'code'=>401], 200);
         }
     }
 
     public function attemptLogin($username, $password)
     {
         $user = User::where('username', $username)->first();
-        if (Hash::check($password, $user->password)) {
+        if (!is_null($user) && Hash::check($password, $user->password)) {
             $this->jwtService = new Auth\JwtAuthServices();
            $token =  $this->jwtService->init($user->uuid, $username);
            return ["user"=>$user, "token"=>$token];

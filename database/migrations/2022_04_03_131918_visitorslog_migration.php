@@ -13,20 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('members', function (Blueprint $table) {
+        Schema::create('visitorslog', function (Blueprint $table) {
             $table->id();
 
-            $table->string('name')->nullable(false);
+            $table->integer('visit_id')->nullable(false);
 
-            $table->string('phone')->nullable(false);
+            $table->integer('visitor_id')->nullable(false);
 
-            $table->string('address')->nullable(false);
+            $table->integer('signed_out')->nullable(false);
 
-            $table->string('email')->nullable(false)->unique();
-
-            $table->string('uuid')->nullable(false)->unique();
-
-            //$table->string('phone')->nullable(false)->unique();
+            $table->timestamp("sign_out_time")->nullable();
 
             $table->rememberToken();
             $table->timestamps();
@@ -40,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('members');
+        //
     }
 };

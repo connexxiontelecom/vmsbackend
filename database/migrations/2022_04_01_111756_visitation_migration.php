@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('visit')->nullable(false);
             $table->integer('member')->nullable(false);
             $table->integer('membertype')->nullable(false);
+            $table->integer('signed_out')->nullable();
+            $table->timestamp("sign_out_time")->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
